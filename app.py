@@ -76,9 +76,7 @@ def index():
 def predict():
     #on clean notre question et on la vectorize 
     question= request.form.to_dict()
-    cleaned_title=text_cleaner(question['review_text_1'])
-    cleaned_question=text_cleaner(question['review_text_2'])
-    cleaned_text=cleaned_title+cleaned_question
+    cleaned_question=text_cleaner(question['review_text'])
     #cleaned_question=['python','c++']
     X_tfidf = vectorizer.transform([cleaned_text])
     #prediction
