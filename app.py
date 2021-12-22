@@ -77,8 +77,7 @@ def predict():
     #on clean notre question et on la vectorize 
     question= request.form.to_dict()
     cleaned_question=text_cleaner(question['review_text'])
-    #cleaned_question=['python','c++']
-    X_tfidf = vectorizer.transform([cleaned_text])
+    X_tfidf = vectorizer.transform([cleaned_question])
     #prediction
     predict = model.predict(X_tfidf)    
     predict_probas = model.predict_proba(X_tfidf)
@@ -90,7 +89,7 @@ def predict():
         .sort_values('Probas', ascending=False)
     #resultat à retourner 
     results = {}
-    results['Predicted_Tags'] = tags_predict
+    results['Predicted_Tags'] = list(sum(tags_predict,()))
     results['Predicted_Tags_Probabilities'] = df_predict_probas\
         .set_index('Tags')['Probas'].to_dict()
     return flask.render_template('predict.html',question=results)
