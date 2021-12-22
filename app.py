@@ -35,26 +35,26 @@ def text_cleaner(x):
     nlp = spacy.load('en_core_web_sm', exclude=['tok2vec', 'ner', 'parser', 'attribute_ruler', 'lemmatizer'])
     x=nlp(x)
     x=garder_nom(x)
-    # Case normalization
+    # tout mettre en minuscule
     x = x.lower()
-    # Remove unicode characters
+    # enlever les caractères unicode
     x = x.encode("ascii", "ignore").decode()
-    # Remove English contractions
+    # enlever les contractions anglaises
     x = re.sub("\'\w+", '', x)
-    # Remove ponctuation but not # (for C# for example)
+    # enlever les ponctuations sauf # pour c#
     x = re.sub('[^\\w\\s#\\S++]', '', x)
-    # Remove links
+    # enlever les liens
     x = re.sub(r'http*\S+', '', x)
-    # Remove numbers
+    # enlever les nombres
     x = re.sub(r'\w*\d+\w*', '', x)
-    # Remove extra spaces
+    # enelver les espaces en trop
     x = re.sub('\s+', ' ', x)
         
     # Tokenization
     x = nltk.tokenize.word_tokenize(x)
-    # List of stop words in select language from NLTK
+    # stop words in english from NLTK
     stop_words = stopwords.words("english")
-    # Remove stop words
+    #stop words
     x = [word for word in x if word not in stop_words 
          and len(word)>2]
     # Lemmatizer
@@ -85,7 +85,7 @@ def predict():
     df_predict_probas = pd.DataFrame(columns=['Tags', 'Probas'])
     df_predict_probas['Tags'] = multilabel_binarizer.classes_
     df_predict_probas['Probas'] = predict_probas.reshape(-1)
-    df_predict_probas = df_predict_probas[df_predict_probas['Probas']>=0.33]\
+    df_predict_probas = df_predict_probas[df_predict_probas['Probas']>=0.25]\
         .sort_values('Probas', ascending=False)
     #resultat à retourner 
     results = {}
