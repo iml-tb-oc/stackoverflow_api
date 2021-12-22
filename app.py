@@ -106,7 +106,7 @@ def predict():
         
    
     
-    return flask.render_template('predict.html', prediction = prediction, prob =np.round(prob[0][0],3)*100)
+    return flask.render_template('predict.html')
 
 
 if __name__ == '__main__':
