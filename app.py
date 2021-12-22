@@ -1,92 +1,65 @@
-from flask import Flask
-from flasgger import Swagger
-from flask_restful import Api, Resource
+from flask import Flask, jsonify, request
+import numpy as np
 import pandas as pd
+from sklearn import linear_model
+#from sklearn.externals import joblib
 import joblib
-import spacy
-import en_core_web_sm
-import preprocessing as ppc
+import re
+from sklearn.feature_extraction.text import CountVectorizer
+import nltk
+nltk.download('wordnet')
+nltk.download('punkt')
+from nltk.stem import WordNetLemmatizer
+  
 
-
+import flask
 app = Flask(__name__)
-api = Api(app)
+clf = joblib.load('quora_model.pkl')
+count_vect = joblib.load('quora_vectorizer.pkl')
+    
+###################################################
+def pre_processing(text):
+    lemmatizer = WordNetLemmatizer()
+    text = text.lower()
+    text = re.sub('[0-9]+','num',text)
+    word_list = nltk.word_tokenize(text)
+    word_list =  [lemmatizer.lemmatize(item) for item in word_list]
+    return ' '.join(word_list)
+###################################################
 
-template = {
-  "swagger": "2.0",
-  "info": {
-    "title": "Stackoverflow tags predictor for question",
-    "description": "API to predict tags of a stackoverflow non-cleaned question. NLP preprocessing and LogisticRegression multi-labels predictions.",
-    "version": "0.0.1"
-  }
-}
 
-swagger = Swagger(app, template=template)
-# Load pre-trained models
-model_path = "models/"
-vectorizer = joblib.load(model_path + "tfidf_vectorizer.pkl", 'r')
-multilabel_binarizer = joblib.load(model_path + "multilabel_binarizer.pkl", 'r')
-model = joblib.load(model_path + "logit_nlp_model.pkl", 'r')
+@app.route('/')
+def index():
+    return flask.render_template('index.html')
 
-class Autotag(Resource):
-    def get(self, question):
-        """
-       This examples uses FlaskRESTful Resource for Stackoverflow auto-tagging questions
-       To test, copy and paste a non-cleaned question (even with HTML tags or code) and execute the model.
-       ---
-       parameters:
-         - in: path
-           name: question
-           type: string
-           required: true
-       responses:
-         '200':
-           description: Predicted list of tags and probabilities
-           content:
-               application/json:
-                   schema:
-                       type: object
-                       properties:
-                           Predicted_Tags:
-                               type: string
-                               description: List of predicted tags with over 50% of probabilities.
-                           Predicted_Tags_Probabilities:
-                               type: string
-                               description: List of tags with over 30% of probabilities
-        """
-        # Clean the question sent
-        nlp = en_core_web_sm.load(exclude=['tok2vec', 'ner', 'parser', 'attribute_ruler', 'lemmatizer'])
-        #nlp = spacy.load('en_core_web_md', exclude=['tok2vec', 'ner', 'parser', 'attribute_ruler', 'lemmatizer'])
-        pos_list = ["NOUN","PROPN"]
-        rawtext = question
-        cleaned_question = ppc.text_cleaner(rawtext, nlp, pos_list, "english")
+
+@app.route('/predict', methods=['POST'])
+def predict():
+    to_predict_list = request.form.to_dict()
+    review_text = pre_processing(to_predict_list['review_text'])
+    
+    pred = clf.predict(count_vect.transform([review_text]))
+    prob = clf.predict_proba(count_vect.transform([review_text]))
+    #pr =  1
+    if prob[0][0]>=0.5:
+        prediction = "Positive"
+        #pr = prob[0][0]
+    else:
+        prediction = "Negative"
+        #pr = prob[0][0]
+
+    # sanity check to filter out non questions. 
+    if not re.search("(?i)(what|which|who|where|why|when|how|whose|\?)",to_predict_list['review_text']):
+        prediction = "Negative"
+        #prob = prob*0
         
-        # Apply saved trained TfidfVectorizer
-        X_tfidf = vectorizer.transform([cleaned_question])
-        
-        # Perform prediction
-        predict = model.predict(X_tfidf)
-        predict_probas = model.predict_proba(X_tfidf)
-        # Inverse multilabel binarizer
-        tags_predict = multilabel_binarizer.inverse_transform(predict)
-        
-        # DataFrame of probas
-        df_predict_probas = pd.DataFrame(columns=['Tags', 'Probas'])
-        df_predict_probas['Tags'] = multilabel_binarizer.classes_
-        df_predict_probas['Probas'] = predict_probas.reshape(-1)
-        # Select probas > 33%
-        df_predict_probas = df_predict_probas[df_predict_probas['Probas']>=0.33]\
-            .sort_values('Probas', ascending=False)
-            
-        # Results
-        results = {}
-        results['Predicted_Tags'] = tags_predict
-        results['Predicted_Tags_Probabilities'] = df_predict_probas\
-            .set_index('Tags')['Probas'].to_dict()
-        
-        return results, 200
+   
+    
+    return flask.render_template('predict.html', prediction = prediction, prob =np.round(prob[0][0],3)*100)
 
 
-api.add_resource(Autotag, '/autotag/<question>')
-
-if __name__ == "__main__":
-	app.run()
+if __name__ == '__main__':
+    #clf = joblib.load('quora_model.pkl')
+    #count_vect = joblib.load('quora_vectorizer.pkl')
+    app.run(debug=True)
+    #app.run(host='localhost', port=8081)
