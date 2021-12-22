@@ -11,3 +11,6 @@ matplotlib>=1.4.3
 pandas>=0.19
 nltk == 3.5
 beautifulsoup4==4.9.3
+spacy==2.3.5
+nltk @ file:///tmp/build/80754af9/nltk_1618327084230/work
+joblib @ file:///tmp/build/80754af9/joblib_1613502643832/work
