@@ -12,5 +12,6 @@ pandas>=0.19
 nltk == 3.5
 beautifulsoup4==4.9.3
 spacy==2.3.5
-nltk @ file:///tmp/build/80754af9/nltk_1618327084230/work
+nltk==3.2.4
 joblib @ file:///tmp/build/80754af9/joblib_1613502643832/work
+en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.3.1/en_core_web_sm-2.3.1.tar.gz
