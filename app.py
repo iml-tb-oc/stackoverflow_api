@@ -63,7 +63,7 @@ def text_cleaner(x):
     # Tokenization
     x = nltk.tokenize.word_tokenize(x)
     # List of stop words in select language from NLTK
-    stop_words = stopwords.words("english)
+    stop_words = stopwords.words("english")
     # Remove stop words
     x = [word for word in x if word not in stop_words 
          and len(word)>2]
