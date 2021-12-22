@@ -4,6 +4,9 @@ import re
 import nltk
 from nltk.corpus import stopwords
 import spacy
+import joblib
+import en_core_web_sm
+
 
 import flask
 
