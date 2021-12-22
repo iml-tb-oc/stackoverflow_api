@@ -24,9 +24,9 @@ import flask
 app = Flask(__name__)
 
 model_path = "models/"
-vectorizer = joblib.load(model_path + "tfidf_vectorizer.pkl", 'r')
-multilabel_binarizer = joblib.load(model_path + "multilabel_binarizer.pkl", 'r')
-model = joblib.load(model_path + "logit_nlp_model.pkl", 'r')
+vectorizer = joblib.load(model_path + "tfidf_vectorizer_2.pkl", 'r')
+multilabel_binarizer = joblib.load(model_path + "multilabel_binarizer_saved.pkl", 'r')
+model = joblib.load(model_path + "regression_model_saved.pkl", 'r')
     
 ###################################################
 
@@ -84,23 +84,25 @@ def index():
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    to_predict_list = request.form.to_dict()
-    review_text = pre_processing(to_predict_list['review_text'])
-    
-    pred = clf.predict(count_vect.transform([review_text]))
-    prob = clf.predict_proba(count_vect.transform([review_text]))
-    #pr =  1
-    if prob[0][0]>=0.5:
-        prediction = "Positive"
-        #pr = prob[0][0]
-    else:
-        prediction = "Negative"
-        #pr = prob[0][0]
-
-    # sanity check to filter out non questions. 
-    if not re.search("(?i)(what|which|who|where|why|when|how|whose|\?)",to_predict_list['review_text']):
-        prediction = "Negative"
-        #prob = prob*0
+    #on clean notre question et on la vectorize 
+    question= request.form.ToString()()
+    cleaned_question=text_cleaner(question)
+    X_tfidf = vectorizer.transform([cleaned_question])
+    #prediction
+    predict = model.predict(X_tfidf)    
+    predict_probas = model.predict_proba(X_tfidf)
+    tags_predict = multilabel_binarizer.inverse_transform(predict)
+    df_predict_probas = pd.DataFrame(columns=['Tags', 'Probas'])
+    df_predict_probas['Tags'] = multilabel_binarizer.classes_
+    df_predict_probas['Probas'] = predict_probas.reshape(-1)
+    df_predict_probas = df_predict_probas[df_predict_probas['Probas']>=0.33]\
+            .sort_values('Probas', ascending=False)
+    #resultat à retourner 
+    results = {}
+    results['Predicted_Tags'] = tags_predict
+    results['Predicted_Tags_Probabilities'] = df_predict_probas\
+            .set_index('Tags')['Probas'].to_dict()
+    return results 
         
    
     
