@@ -1,20 +1,8 @@
-from flask import Flask, jsonify, request
-import numpy as np
-import pandas as pd
-from sklearn import linear_model
-#from sklearn.externals import joblib
-import joblib
-import re
-from sklearn.feature_extraction.text import CountVectorizer
-import nltk
-nltk.download('wordnet')
-nltk.download('punkt')
-from nltk.stem import WordNetLemmatizer
 import numpy as np
 import pandas as pd
 import re
-from bs4 import BeautifulSoup
 from langdetect import detect
+from deep_translator import GoogleTranslator
 import nltk
 from nltk.corpus import stopwords
 import spacy
