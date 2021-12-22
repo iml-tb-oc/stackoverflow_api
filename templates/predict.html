@@ -40,9 +40,14 @@ progress:after {
 
  <body>
  	 <h1> coucou c'est ici que je dois avoir les tags: question</h1>
-  {% for table in tables %}
-            {{titles[loop.index]}}
-            {{ table|safe }}
+  <table>
+{% for key, value in result.iteritems() %}
+   <tr>
+        <th> {{ key }} </th>
+        <td> {{ value }} </td>
+   </tr>
+{% endfor %}
+</table>
  </body>
  </html>
  
