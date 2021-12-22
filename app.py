@@ -1,8 +1,6 @@
 import numpy as np
 import pandas as pd
 import re
-from langdetect import detect
-from deep_translator import GoogleTranslator
 import nltk
 from nltk.corpus import stopwords
 import spacy
