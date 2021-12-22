@@ -77,22 +77,22 @@ def predict():
     #on clean notre question et on la vectorize 
     question= request.form.to_dict()
     cleaned_question=text_cleaner(question['review_text'])
-    #X_tfidf = vectorizer.transform([cleaned_question])
+    X_tfidf = vectorizer.transform([cleaned_question])
     #prediction
-    #predict = model.predict(X_tfidf)    
-    #predict_probas = model.predict_proba(X_tfidf)
-    #tags_predict = multilabel_binarizer.inverse_transform(predict)
-    #df_predict_probas = pd.DataFrame(columns=['Tags', 'Probas'])
-    #df_predict_probas['Tags'] = multilabel_binarizer.classes_
-    #df_predict_probas['Probas'] = predict_probas.reshape(-1)
-    #df_predict_probas = df_predict_probas[df_predict_probas['Probas']>=0.33]\
-     #       .sort_values('Probas', ascending=False)
+    predict = model.predict(X_tfidf)    
+    predict_probas = model.predict_proba(X_tfidf)
+    tags_predict = multilabel_binarizer.inverse_transform(predict)
+    df_predict_probas = pd.DataFrame(columns=['Tags', 'Probas'])
+    df_predict_probas['Tags'] = multilabel_binarizer.classes_
+    df_predict_probas['Probas'] = predict_probas.reshape(-1)
+    df_predict_probas = df_predict_probas[df_predict_probas['Probas']>=0.33]\
+        .sort_values('Probas', ascending=False)
     #resultat à retourner 
-    #results = {}
-    #results['Predicted_Tags'] = tags_predict
-    #results['Predicted_Tags_Probabilities'] = df_predict_probas\
-     #       .set_index('Tags')['Probas'].to_dict()
-    return flask.render_template('predict.html',question=cleaned_question)
+    results = {}
+    results['Predicted_Tags'] = tags_predict
+    results['Predicted_Tags_Probabilities'] = df_predict_probas\
+        .set_index('Tags')['Probas'].to_dict()
+    return flask.render_template('predict.html',results=results)
 
 
 if __name__ == '__main__':
