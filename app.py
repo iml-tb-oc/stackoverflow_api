@@ -75,7 +75,7 @@ def index():
 @app.route('/predict', methods=['POST'])
 def predict():
     #on clean notre question et on la vectorize 
-    question= request.form.get()
+    question= request.args.get()
     cleaned_question=text_cleaner(question)
     X_tfidf = vectorizer.transform([cleaned_question])
     #prediction
