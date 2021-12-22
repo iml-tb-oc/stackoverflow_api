@@ -8,61 +8,21 @@ import nltk
 from nltk.corpus import stopwords
 import spacy
 
-# Initialize NLP parameters
-#nltk.download('popular')
+ef garder_nom(x):
+    text = []
+    for token in x:
+        if token.pos_ in ["NOUN","PROPN"]:
+            text.append(token.text)
+    text=" ".join(text)
+    text = text.lower().replace("c #", "c#")
+    return text
 
-# Cleaning function for new question
-def remove_pos(nlp, x, pos_list):
-    """NLP cleaning function based on the POS-Tagging of the Spacy library. 
-    It allows you to keep only the Parts Of Speech listed as a parameter. 
-    Parameters
-    ----------------------------------------
-    nlp : spacy pipeline
-        Load pipeline with options.
-        ex : spacy.load('en', exclude=['tok2vec', 'ner', 'parser', 
-                                'attribute_ruler', 'lemmatizer'])
-    x : string
-        Sequence of characters to modify.
-    pos_list : list
-        List of POS to conserve.
-    ----------------------------------------
-    """
-    # Test of language detection
-    lang = detect(x)
-    if(lang != "en"):
-        # Deep translate if not in English
-        x = GoogleTranslator(source='auto', target='en').translate(x)
-    
-    doc = nlp(x)
-    list_text_row = []
-    for token in doc:
-        if(token.pos_ in pos_list):
-            list_text_row.append(token.text)
-    join_text_row = " ".join(list_text_row)
-    join_text_row = join_text_row.lower().replace("c #", "c#")
-    return join_text_row
 
-def text_cleaner(x, nlp, pos_list, lang="english"):
-    """Function allowing to carry out the preprossessing on the textual data. 
-        It allows you to remove extra spaces, unicode characters, 
-        English contractions, links, punctuation and numbers.
-        
-        The re library for using regular expressions must be loaded beforehand.
-        The SpaCy and NLTK librairies must be loaded too. 
-    Parameters
-    ----------------------------------------
-    nlp : spacy pipeline
-        Load pipeline with options.
-        ex : spacy.load('en', exclude=['tok2vec', 'ner', 'parser', 
-                                'attribute_ruler', 'lemmatizer'])
-    x : string
-        Sequence of characters to modify.
-    pos_list : list
-        List of POS to conserve.
-    ----------------------------------------
-    """
+def text_cleaner(x):
     # Remove POS not in "NOUN", "PROPN"
-    x = remove_pos(nlp, x, pos_list)
+    nlp = spacy.load('en_core_web_sm', exclude=['tok2vec', 'ner', 'parser', 'attribute_ruler', 'lemmatizer'])
+    x=nlp(x)
+    x=garder_nom(x)
     # Case normalization
     x = x.lower()
     # Remove unicode characters
@@ -91,3 +51,4 @@ def text_cleaner(x, nlp, pos_list, lang="english"):
     
     # Return cleaned text
     return x
+###################
