@@ -40,11 +40,14 @@ progress:after {
 
  <body>
  	 <h1> blabla</h1>
-{% for value in question %}
+<table>
+{% for key, value in question.iteritems() %}
    <tr>
+        <th> {{ key }} </th>
         <td> {{ value }} </td>
    </tr>
 {% endfor %}
+</table>
  </body>
  </html>
  
