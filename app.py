@@ -75,9 +75,9 @@ def index():
 @app.route('/predict', methods=['POST'])
 def predict():
     #on clean notre question et on la vectorize 
-    #question= request.form.to_dict()
-    #cleaned_question=text_cleaner(question['review_text'])
-    cleaned_question=['python','c++']
+    question= request.form.to_dict()
+    cleaned_question=text_cleaner(question['review_text'])
+    #cleaned_question=['python','c++']
     X_tfidf = vectorizer.transform([cleaned_question])
     #prediction
     predict = model.predict(X_tfidf)    
