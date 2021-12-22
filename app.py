@@ -42,7 +42,7 @@ def text_cleaner(x):
     # Remove English contractions
     x = re.sub("\'\w+", '', x)
     # Remove ponctuation but not # (for C# for example)
-    x = re.sub('[^\\w\\s#]', '', x)
+    x = re.sub('[^\\w\\s#\\S++]', '', x)
     # Remove links
     x = re.sub(r'http*\S+', '', x)
     # Remove numbers
