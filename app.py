@@ -93,7 +93,7 @@ def predict():
     results['Predicted_Tags'] = tags_predict
     results['Predicted_Tags_Probabilities'] = df_predict_probas\
         .set_index('Tags')['Probas'].to_dict()
-    return flask.render_template('predict.html',question=cleaned_question)
+    return flask.render_template('predict.html',question=results)
 
 
 if __name__ == '__main__':
