@@ -14,9 +14,9 @@ import flask
 app = Flask(__name__)
 
 model_path = "models/"
-vectorizer = joblib.load(model_path + "tfidf_vectorizer_2.pkl", 'r')
-multilabel_binarizer = joblib.load(model_path + "multilabel_binarizer_saved.pkl", 'r')
-model = joblib.load(model_path + "regression_model_saved.pkl", 'r')
+vectorizer = joblib.load(model_path + "tfidf_vectorizer_2.joblib", 'r')
+multilabel_binarizer = joblib.load(model_path + "multilabel_binarizer_saved.joblib", 'r')
+model = joblib.load(model_path + "regression_model_saved.joblib", 'r')
     
 ###################################################
 
